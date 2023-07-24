@@ -8,23 +8,17 @@
 
 (def given-formatter (jtf/formatter "M/d/yy h:mm:ss a"))
 
-(def rfc3339-formatter (jtf/formatter "yyyy-MM-dd'T'HH:mm:ss.SSZZZ"))
+(def rfc3339-formatter (jtf/formatter "yyyy-MM-dd'T'HH:mm:ssXXX"))
 
-;; TODO: output to pacific
-(defn given-ts->rfc3339 [ds]
-  (jtf/format rfc3339-formatter
-              (jt/zoned-date-time
-               (jt/local-date-time given-formatter ds)
-               "UTC-09:00")))
-
-; TODO: accept zoned dt, convert to eastern
+; TODO: log/throw exception on unparseable rows
 (defn given-ts->eastern [ds]
   (jtf/format rfc3339-formatter
-              (jt/zoned-date-time
-               (jt/zoned-date-time
+              (jt/zoned-date-time ; converting Pacifiic to Eastern
+               (jt/zoned-date-time ; create a DT with Pacific
                 (jt/local-date-time given-formatter ds)
-                "UTC-08:00") "UTC-05:00")))
+                "US/Pacific") "US/Eastern")))
 
+; TODO: log/throw exception on unparseable rows
 (defn hmsms->secs
   "Doing this manually...rounding to nearest second"
   [hmsstr]
@@ -36,20 +30,23 @@
         ms (Integer/parseInt ms)]
     (Math/round (+ (* h 3600) (* m 60) s (/ ms 1000.0)))))
 
-(defn zip-with-leading
-  "Just adds leading zeros in a Clojure-y way"
-  [z]
-  (let [zstr (str z)]
-    (str
-     (apply str (repeat (- 5 (count zstr)) "0"))
-     zstr)))
+(defn zip-with-leading [z]
+  (format "%05d" (Integer/parseInt z)))
 
-; TODO: doublecheck this is right
-(defn sanitize-utf8 [s]
-  (let [utf8-pattern #"[^\x00-\x7F]"]
-    (str/replace s utf8-pattern replacement-char)))
+; TODO: more effiicient way to do this? 
+(defn valid-unicode? [c]
+  (try (.getName (java.lang.Character. c))
+       true
+       (catch IllegalArgumentException _ false)))
 
-(defn wrap-if-comma [s]
+; TODO: ensure that this approach is valid for catching what we want to catch
+(defn sanitize-unicode [s]
+  (str/join (map (fn [c]
+                   (if valid-unicode?
+                     c
+                     replacement-char)) (seq s))))
+
+(defn wrap-commas [s]
   (if (str/includes? s ",")
     (str "\"" s "\"")
     s))

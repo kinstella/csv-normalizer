@@ -9,9 +9,12 @@ This requires a few items to be installed.
 #### Installation on MacOS
 On MacOS, with homebrew, you should be able to install the necessary Clojure build system with the following commands, although this may take a few minutes.
 
+##### Assumptions 
+
 This approach assumes you have 
 1. Homebrew installed using the following approach https://brew.sh
 2. Java Runtime with java in your PATH. https://www.andrewhoog.com/post/3-ways-to-install-java-on-macos-2023/
+
 
 Then simply install Clojure and Leiningen with the following commands:
 ```
@@ -37,13 +40,12 @@ You can install all of these by installing Leiningen through apt:
 
 `sudo apt install leiningen`
 
-Once installed, to build the system, you should be able to type:
+Once installed, to build the system, you should be able to run:
 `lein uberjar`
 
 This will create a standalone uberjar in the ./target directory.
 
 For convenience, a bash shell script exists as `normalizer` in the root of this repository. You may need to enable it as an executable, with the following command:
-
 `chmod 755 normalizer`
 
 ## Usage
@@ -59,6 +61,6 @@ For example, you should be able to type the following for the normalizer to read
 
 This is a work-in-progress, with the following modifications to be added when time allows:
 
+- [ ] Add exception handler that logs to stderr and omits a row if a parsing error occurs
 - [ ] Add some unit tests
 - [ ] Use babashka instead of bash as a shell script
-
