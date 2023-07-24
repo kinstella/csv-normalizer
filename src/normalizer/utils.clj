@@ -14,7 +14,7 @@
 (def rfc3339-formatter (jtf/formatter :rfc))
 
 (defn ts->iso-dt [ts]
-  (jtf/format (jtf/formatter :iso-date-time) (jtf/parse given-formatter "12/12/16 1:01:00 AM")))
+  (jtf/format (jtf/formatter :iso-date-time) (jtf/parse given-formatter ts)))
 
 (defn hmsms->secs
   "Doing this manually...rounding to nearest second"

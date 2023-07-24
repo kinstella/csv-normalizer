@@ -35,18 +35,18 @@
          "Timestamp" (utils/ts->iso-dt rowval)
          "Address" (str "\"" rowval "\"")
          "ZIP" (utils/zip-with-leading rowval)
-         "FullName" rowval
+         "FullName" (str "\"" rowval "\"")
          "FooDuration" (utils/hmsms->secs rowval)
          "BarDuration" (utils/hmsms->secs rowval)
          "TotalDuration" (+ (utils/hmsms->secs fooval)
                             (utils/hmsms->secs barval))
-         "Notes" rowval
+         "Notes" (str "\"" rowval "\"")
          :else rowval))
      header row)))
 
 (defn output-row [r]
   ; TODO: make sure to wrap address and everything else in quotes
-  )
+  (println (str/join ", " r)))
 
 (defn parse-csv-file [file]
   (let [csv-data (with-open [reader (clojure.java.io/reader file)]
@@ -54,7 +54,8 @@
         header (first csv-data)
         transformed-data (mapv #(process-row header %) (rest csv-data))]
     (write-stdout (str/join ", " header))
-    (write-stdout (mapv #(str/join ", " %) transformed-data))))
+    (map output-row
+         transformed-data)))
 
 (defn -main [& args]
   (doseq [line (line-seq (io/reader *in*))]
