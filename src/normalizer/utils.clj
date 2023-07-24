@@ -1,21 +1,29 @@
 (ns normalizer.utils
-  (:require [java-time.api :as jt]
-            [clojure.string :as str]
-            [java-time.format :as jtf]
-            [clj-time.format :as f]
-            [clojure.instant :as i]
-            [clj-time.core :as t]
-            [clj-time.coerce :as tc]))
+  (:require
+   [clojure.string :as str]
+   [java-time.format :as jtf]
+   [java-time.api :as jt]))
 
 (def replacement-char "\uFFFD")
 
 (def given-formatter (jtf/formatter "M/d/yy h:mm:ss a"))
 
-(def rfc3339-formatter (jtf/formatter :rfc))
+(def rfc3339-formatter (jtf/formatter "yyyy-MM-dd'T'HH:mm:ss.SSZZZ"))
 
-; TODO: make this work
-(defn ts->iso-dt [ts]
-  (jtf/format (jtf/formatter :iso-date-time) (jtf/parse given-formatter ts)))
+(defn given-ts->rfc3339 [ds]
+  (jtf/format rfc3339-formatter
+              (jt/zoned-date-time
+               (jt/local-date-time given-formatter ds)
+               "UTC-09:00")))
+
+(defn given-ts->eastern [ds]
+  (jtf/format rfc3339-formatter
+              (jt/zoned-date-time
+               (jt/zoned-date-time
+                (jt/local-date-time given-formatter ds)
+                "UTC-08:00") "UTC-05:00")))
+
+
 
 (defn hmsms->secs
   "Doing this manually...rounding to nearest second"
@@ -36,22 +44,12 @@
      (apply str (repeat (- 5 (count zstr)) "0"))
      zstr)))
 
-; TODO: make this work
+; TODO: doublecheck this is right
 (defn sanitize-utf8 [s]
   (let [utf8-pattern #"[^\x00-\x7F]"]
     (str/replace s utf8-pattern replacement-char)))
 
-(comment
-
-  (hmsms->secs "1:23:32.123")
-
-  (jtf/format (jtf/formatter :iso-date) (jtf/parse given-formatter "03/12/16 11:01:00 PM"))
-  (jtf/format (jtf/formatter :iso-date-time) (jtf/parse given-formatter "12/12/16 1:01:00 AM"))
-
-  ;(ts->rfc3339 "3/12/16 11:01:00 PM")
-
-
-
-  ;
-  )
-
+(defn wrap-if-comma [s]
+  (if (str/includes? s ",")
+    (str "\"" s "\"")
+    s))

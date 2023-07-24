@@ -10,61 +10,55 @@
   ((binding [*out* *err*]
      (println s))))
 
-(defn read-csv [file]
-  (with-open [reader (io/reader file)]
-    (doall (csv/read-csv reader))))
-
 (defn write-stdout
   "Ensure that stdout is UTF-8 encoded"
-  [data]
+  [s]
   (let [stdout (io/writer *out* :encoding "UTF-8")]
     (binding [*out* stdout]
-      (println data)
-      (flush))))
+      (println s))))
 
+; TODO: replace this with a map
 (defn process-row [header row]
-
   ;; grab vals we may need for later
-  (let [fooidx (.indexOf header "FooDuration")
-        fooval (nth row fooidx)
-        baridx (.indexOf header "BarDuration")
-        barval (nth row baridx)]
+  (let [fooval (nth row (.indexOf header "FooDuration"))
+        barval (nth row (.indexOf header "BarDuration"))]
     (mapv
      (fn [colname rowval]
        (case colname
-         "Timestamp" (utils/ts->iso-dt rowval)
-         "Address" (utils/sanitize-utf8 (str "\"" rowval "\""))
+         "Timestamp" (utils/given-ts->eastern rowval)
+         "Address" (utils/wrap-if-comma rowval)
          "ZIP" (utils/zip-with-leading rowval)
-         "FullName" (utils/sanitize-utf8 (str "\"" rowval "\""))
+         "FullName"  (utils/wrap-if-comma (str/upper-case rowval))
          "FooDuration" (utils/hmsms->secs rowval)
          "BarDuration" (utils/hmsms->secs rowval)
          "TotalDuration" (+ (utils/hmsms->secs fooval)
                             (utils/hmsms->secs barval))
-         "Notes" (utils/sanitize-utf8 (str "\"" rowval "\""))
-         :else rowval))
+         "Notes" (utils/wrap-if-comma rowval)
+         :else (utils/wrap-if-comma rowval)))
      header row)))
 
 (defn output-row [r]
   ; TODO: make sure to wrap address and everything else in quotes
-  (println (str/join ", " r)))
+  (utils/sanitize-utf8 (str/join "," r)))
 
 (defn parse-csv-file [file]
   (let [csv-data (with-open [reader (clojure.java.io/reader file)]
                    (doall (csv/read-csv reader)))
         header (first csv-data)
         transformed-data (mapv #(process-row header %) (rest csv-data))]
-    (write-stdout (str/join ", " header))
-    (map output-row
-         transformed-data)))
+    (write-stdout (str/join "," header))
+    (doseq [r transformed-data]
+      (write-stdout (output-row r)))))
 
 (defn -main [& args]
-  (doseq [line (line-seq (io/reader *in*))]
-    (parse-csv-file line)))
-
+  (parse-csv-file (io/reader *in*)))
 
 (comment
 
   (parse-csv-file (io/resource "sample-broken-utf8.csv"))
 
+  (parse-csv-file (io/resource "sample.csv"))
+
   ;
   )
+    
