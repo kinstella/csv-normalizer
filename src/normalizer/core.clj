@@ -6,6 +6,7 @@
             [normalizer.utils :as utils])
   (:gen-class))
 
+; TODO: need this?
 (defn to-stderr [s]
   ((binding [*out* *err*]
      (println s))))
@@ -50,15 +51,5 @@
     (doseq [r transformed-data]
       (write-stdout (output-row r)))))
 
-(defn -main [& args]
+(defn -main []
   (parse-csv-file (io/reader *in*)))
-
-(comment
-
-  (parse-csv-file (io/resource "sample-broken-utf8.csv"))
-
-  (parse-csv-file (io/resource "sample.csv"))
-
-  ;
-  )
-    

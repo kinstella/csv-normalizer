@@ -10,20 +10,20 @@
 
 (def rfc3339-formatter (jtf/formatter "yyyy-MM-dd'T'HH:mm:ss.SSZZZ"))
 
+;; TODO: output to pacific
 (defn given-ts->rfc3339 [ds]
   (jtf/format rfc3339-formatter
               (jt/zoned-date-time
                (jt/local-date-time given-formatter ds)
                "UTC-09:00")))
 
+; TODO: accept zoned dt, convert to eastern
 (defn given-ts->eastern [ds]
   (jtf/format rfc3339-formatter
               (jt/zoned-date-time
                (jt/zoned-date-time
                 (jt/local-date-time given-formatter ds)
                 "UTC-08:00") "UTC-05:00")))
-
-
 
 (defn hmsms->secs
   "Doing this manually...rounding to nearest second"

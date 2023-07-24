@@ -1,44 +1,64 @@
-# normalizer
-
-FIXME: description
+# CSV Normalizer
 
 ## Installation
 
-Download from http://example.com/FIXME.
+System dependencies:
+This is a Clojure application built with leiningen.
+This requires a few items to be installed.
+
+#### Installation on MacOS
+On MacOS, with homebrew, you should be able to install the necessary Clojure build system with the following commands, although this may take a few minutes.
+
+This approach assumes you have 
+1. Homebrew installed using the following approach https://brew.sh
+2. Java Runtime with java in your PATH. https://www.andrewhoog.com/post/3-ways-to-install-java-on-macos-2023/
+
+Then simply install Clojure and Leiningen with the following commands:
+```
+brew install clojure
+
+brew install leiningen
+```
+
+To build the executable, execute the following Leiningen command to build an executable:
+```
+lein uberjar
+```
+This will create two JVM uberjars in the `./target` directory, with one `standalone` version.
+
+For convenience, a bash shell script exists as `normalizer` in the root of this repository. You may need to set it to run as an executable, using the following:
+
+`chmod 755 normalizer`
+
+#### Installation on Ubuntu
+
+On Ubuntu, you'll need Leiningen, Clojure, and a JDK:
+You can install all of these by installing Leiningen through apt:
+
+`sudo apt install leiningen`
+
+Once installed, to build the system, you should be able to type:
+`lein uberjar`
+
+This will create a standalone uberjar in the ./target directory.
+
+For convenience, a bash shell script exists as `normalizer` in the root of this repository. You may need to enable it as an executable, with the following command:
+
+`chmod 755 normalizer`
 
 ## Usage
 
-FIXME: explanation
+This tool accepts STDIN as input and outputs to STDOUT, so you should be able to use the standard redirect operators with the executable.
 
-    $ java -jar normalizer-0.1.0-standalone.jar [args]
+For example, you should be able to type the following for the normalizer to read a CSV at `resources/sample.csv` and output a new CSV file at `normalized.csv`:
+```
+./normalizer < resources/sample.csv > normalized.csv
+```
 
-## Options
+## TODO
 
-FIXME: listing of options this app accepts.
+This is a work-in-progress, with the following modifications to be added when time allows:
 
-## Examples
+- [ ] Add some unit tests
+- [ ] Use babashka instead of bash as a shell script
 
-...
-
-### Bugs
-
-...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
-
-## License
-
-Copyright © 2023 FIXME
-
-This program and the accompanying materials are made available under the
-terms of the Eclipse Public License 2.0 which is available at
-http://www.eclipse.org/legal/epl-2.0.
-
-This Source Code may also be made available under the following Secondary
-Licenses when the conditions for such availability set forth in the Eclipse
-Public License, v. 2.0 are satisfied: GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License, or (at your
-option) any later version, with the GNU Classpath Exception which is available
-at https://www.gnu.org/software/classpath/license.html.
