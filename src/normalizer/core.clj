@@ -33,14 +33,14 @@
      (fn [colname rowval]
        (case colname
          "Timestamp" (utils/ts->iso-dt rowval)
-         "Address" (str "\"" rowval "\"")
+         "Address" (utils/sanitize-utf8 (str "\"" rowval "\""))
          "ZIP" (utils/zip-with-leading rowval)
-         "FullName" (str "\"" rowval "\"")
+         "FullName" (utils/sanitize-utf8 (str "\"" rowval "\""))
          "FooDuration" (utils/hmsms->secs rowval)
          "BarDuration" (utils/hmsms->secs rowval)
          "TotalDuration" (+ (utils/hmsms->secs fooval)
                             (utils/hmsms->secs barval))
-         "Notes" (str "\"" rowval "\"")
+         "Notes" (utils/sanitize-utf8 (str "\"" rowval "\""))
          :else rowval))
      header row)))
 

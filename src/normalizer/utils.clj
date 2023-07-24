@@ -13,6 +13,7 @@
 
 (def rfc3339-formatter (jtf/formatter :rfc))
 
+; TODO: make this work
 (defn ts->iso-dt [ts]
   (jtf/format (jtf/formatter :iso-date-time) (jtf/parse given-formatter ts)))
 
@@ -34,6 +35,11 @@
     (str
      (apply str (repeat (- 5 (count zstr)) "0"))
      zstr)))
+
+; TODO: make this work
+(defn sanitize-utf8 [s]
+  (let [utf8-pattern #"[^\x00-\x7F]"]
+    (str/replace s utf8-pattern replacement-char)))
 
 (comment
 
